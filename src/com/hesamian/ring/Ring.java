@@ -6,50 +6,70 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * This class handles Polynomial ring. Ring is a combination of Monomials,
+ * Operations and even nested Rings.
+ * 
+ * @author Seyedamirhossein Hesamian
+ * @since 08/30/2016
+ */
+
 public class Ring {
     private ArrayList<Object> array = null;
-    private String raw = null;
 
+    /**
+     * This is a basic constructor that initializes Ring.
+     * 
+     * @param None
+     * @return None
+     */
     public Ring() {
         super();
-        if (array == null) {
-            array = new ArrayList<Object>();
-        }
+        array = new ArrayList<Object>();
     }
 
+    /**
+     * This constructor initializes Ring and adds the Monomial to the ring.
+     * After this, you can use addMonomial (which supports method chaining) to
+     * add Operation and Monomials to the Ring.
+     * 
+     * @param None
+     * @return None
+     */
     public Ring(Monomial monomial) {
         this();
-        if (array == null) {
-            array = new ArrayList<Object>();
-        }
-
         array.add(monomial);
         checkStructure();
     }
 
-    public Ring(Operation operation, Monomial monomial) {
-        this();
-        if (array == null) {
-            array = new ArrayList<Object>();
-        }
-
-        array.add(operation);
-        array.add(monomial);
-        checkStructure();
-    }
-
+    /**
+     * This constructor initializes Ring and adds the Monomial1, Operation,
+     * Monomial2 to the ring. After this, you can use addMonomial (which
+     * supports method chaining) to add Operation and Monomials to the Ring.
+     * 
+     * @param Monomial1
+     * @param Operation
+     * @param Monomial2
+     * @return None
+     */
     public Ring(Monomial monomial1, Operation operation, Monomial monomial2) {
-        super();
-        if (array == null) {
-            array = new ArrayList<Object>();
-        }
-
+        this();
         array.add(monomial1);
         array.add(operation);
         array.add(monomial2);
         checkStructure();
     }
 
+    /**
+     * This constructor initializes Ring using a String. Make sure String is
+     * properly formatted. Currently, code supports parenthesis as well. Please
+     * review jUnit tests to see the capabilities of the code. After this, you
+     * can use addMonomial (which supports method chaining) to add Operation and
+     * Monomials to the Ring.
+     * 
+     * @param None
+     * @return None
+     */
     public Ring(String str) {
         this();
 
@@ -69,6 +89,16 @@ public class Ring {
 
         checkStructure();
     }
+
+    /**
+     * This method processes a String (expression that was given to Ring(String)
+     * constructor) and returns String array. Note that it does not processes
+     * parenthesis. Parenthesis are processed recursively.
+     * 
+     * @param String
+     *            that was given to Ring(String) constructor
+     * @return Processes String array
+     */
     public static String[] processComplexExpression(String str) {
         ArrayList<String> list = new ArrayList<String>();
 
@@ -116,7 +146,15 @@ public class Ring {
 
         return list.toArray(new String[list.size()]);
     }
-
+    /**
+     * This method processes a adds a Operation and Monomial to the Ring. This
+     * method supports method chaining.
+     * 
+     * @param Operation
+     * @param Monomial
+     *            to be added to the Ring
+     * @return Ring
+     */
     public Ring addMonomial(Operation operation, Monomial monomial) {
         array.add(operation);
         array.add(monomial);
@@ -126,6 +164,32 @@ public class Ring {
         return this;
     }
 
+    /**
+     * This method processes a adds a Operation and "Monomial" (actually another
+     * Ring) to the Ring. This method supports method chaining.
+     * 
+     * @param Operation
+     * @param "Monomial" (Ring) to be added to the Ring
+     * @return Ring
+     */
+    public Ring addMonomial(Operation operation, Ring ring) {
+        array.add(operation);
+        array.add(ring);
+
+        checkStructure();
+
+        return this;
+    }
+
+    /**
+     * This method evaluates a Ring. It uses a Map<String, BigInteger> to
+     * evaluate the Ring.
+     * 
+     * @param Map
+     *            <String, BigInteger> to lookup Monomial variable name and it's
+     *            respective BigInteger value
+     * @return BigInteger result
+     */
     public BigInteger evaluate(Map<String, BigInteger> map) {
         if (array.size() == 0) {
             return BigInteger.ZERO;
@@ -153,20 +217,20 @@ public class Ring {
                             value1 = (BigInteger) clonedArray[index - 1];
                         } else if (clonedArray[index - 1] instanceof Monomial) {
                             value1 = ((Monomial) clonedArray[index - 1]).evaluate(map);
-                        } else if (clonedArray[index - 1] instanceof Monomial) {
+                        } else if (clonedArray[index - 1] instanceof Ring) {
                             value1 = ((Ring) clonedArray[index - 1]).evaluate(map);
                         } else {
-                            System.out.println("Critical error during evaluation.");
+                            System.out.println("Critical error during evaluation." + clonedArray[index - 1]);
                         }
 
                         if (clonedArray[index + 1] instanceof BigInteger) {
                             value2 = (BigInteger) clonedArray[index + 1];
                         } else if (clonedArray[index + 1] instanceof Monomial) {
                             value2 = ((Monomial) clonedArray[index + 1]).evaluate(map);
-                        } else if (clonedArray[index + 1] instanceof Monomial) {
-                            value1 = ((Ring) clonedArray[index + 1]).evaluate(map);
+                        } else if (clonedArray[index + 1] instanceof Ring) {
+                            value2 = ((Ring) clonedArray[index + 1]).evaluate(map);
                         } else {
-                            System.out.println("Critical error during evaluation.");
+                            System.out.println("Critical error during evaluation." + clonedArray[index + 1]);
                         }
 
                         Object tempArray[] = new Object[clonedArray.length - 2];
@@ -193,22 +257,45 @@ public class Ring {
             return (BigInteger) clonedArray[0];
         }
     }
+
+    /**
+     * This method returns Monomials in the Ring as well as it's nested Rings.
+     * 
+     * @param None
+     * @return Array of Monomial
+     */
     public Monomial[] getMonomials() {
         ArrayList<Monomial> monomials = new ArrayList<Monomial>();
 
         for (Object object : array) {
             if (object instanceof Monomial) {
                 monomials.add((Monomial) object);
+            } else if (object instanceof Ring) {
+                monomials.addAll(Arrays.asList(((Ring) object).getMonomials()));
             }
         }
 
         return monomials.toArray(new Monomial[monomials.size()]);
     }
 
+    /**
+     * This method returns array of object that Ring is based on. Note that
+     * return value is cloned of ArrayList.toArray().
+     * 
+     * @param None
+     * @return Array of Objects
+     */
     public Object[] getArray() {
-        return array.toArray();
+        return array.toArray().clone();
     }
 
+    /**
+     * This method checks if data structure is corrupt or not. Note that it does
+     * not throws an exception. However, it simply prints and error message.
+     * 
+     * @param None
+     * @return None
+     */
     private void checkStructure() {
         int counter = 0;
 
@@ -220,6 +307,12 @@ public class Ring {
         }
     }
 
+    /**
+     * Overridden hashCode method auto generated by eclipse IDE.
+     * 
+     * @param None
+     * @return Hash value
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -228,6 +321,12 @@ public class Ring {
         return result;
     }
 
+    /**
+     * Overridden equals method auto generated by eclipse IDE.
+     * 
+     * @param None
+     * @return Boolean equality
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -245,6 +344,13 @@ public class Ring {
         return true;
     }
 
+    /**
+     * Overridden toString method auto generated by eclipse IDE.
+     * 
+     * @param None
+     * @return String representation value
+     */
+    @Override
     public String toString() {
         String str = "";
         Iterator<Object> iterator = array.iterator();
