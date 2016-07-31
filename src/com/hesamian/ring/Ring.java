@@ -91,62 +91,6 @@ public class Ring {
     }
 
     /**
-     * This method processes a String (expression that was given to Ring(String)
-     * constructor) and returns String array. Note that it does not processes
-     * parenthesis. Parenthesis are processed recursively.
-     * 
-     * @param String
-     *            that was given to Ring(String) constructor
-     * @return Processes String array
-     */
-    public static String[] processComplexExpression(String str) {
-        ArrayList<String> list = new ArrayList<String>();
-
-        str = str.replaceAll(" ", "");
-
-        String temp = "";
-        boolean expression = false;
-        int countOfExpressions = 0;
-
-        for (int index = 0; index < str.length(); index++) {
-            if (str.charAt(index) == '(' || str.charAt(index) == ')' || expression) {
-                temp += str.charAt(index);
-                countOfExpressions = (str.charAt(index) == '(') ? (countOfExpressions + 1) : (str.charAt(index) == ')' ? countOfExpressions - 1 : countOfExpressions);
-                expression = (str.charAt(index) == ')' && countOfExpressions == 0) ? false : true;
-            } else if (Character.isAlphabetic(str.charAt(index)) || Character.isDigit(str.charAt(index))) {
-                temp += str.charAt(index);
-            } else if (str.charAt(index) == '^' && index + 1 < str.length() && Character.isDigit(str.charAt(index + 1))) {
-                temp += str.charAt(index);
-            } else if (Operation.existPrintName(Character.toString(str.charAt(index))) > -1) {
-                list.add(temp);
-                list.add(Character.toString(str.charAt(index)));
-                temp = "";
-            }
-        }
-
-        if (!temp.isEmpty()) {
-            list.add(temp);
-        }
-
-        Iterator<String> iterator = list.iterator();
-
-        while (iterator.hasNext()) {
-            temp = iterator.next();
-
-            if (temp.contains("^") && temp.substring(temp.indexOf("^") + 1).matches(".*[a-zA-Z]+.*")) {
-                int index = list.indexOf(temp);
-
-                list.set(index, temp.substring(0, temp.indexOf("^")));
-                list.add(index + 1, "^");
-                list.add(index + 2, temp.substring(temp.indexOf("^") + 1));
-
-                iterator = list.iterator();
-            }
-        }
-
-        return list.toArray(new String[list.size()]);
-    }
-    /**
      * This method processes a adds a Operation and Monomial to the Ring. This
      * method supports method chaining.
      * 
@@ -177,6 +121,32 @@ public class Ring {
         array.add(ring);
 
         checkStructure();
+
+        return this;
+    }
+
+    /**
+     * This method gets as argument Map<String, String> and it will loop through
+     * the Ring and replace old variables with new one. For example: x -> y.
+     * Avoid over complicating or misusing this method. For instance replacing x
+     * -> y^2 will result in: 2x^3 -> 2y^2^3 which is invalid. This method
+     * supports method chaining.
+     * 
+     * @param Map
+     *            <String, String>
+     * @return Ring
+     */
+    public Ring replaceVariables(Map<String, String> map) {
+        String raw = this.toString();
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            raw = raw.replaceAll(key, value);
+        }
+
+        this.array = new Ring(raw).array;
 
         return this;
     }
@@ -369,4 +339,60 @@ public class Ring {
         return str;
     }
 
+    /**
+     * This method processes a String (expression that was given to Ring(String)
+     * constructor) and returns String array. Note that it does not processes
+     * parenthesis. Parenthesis are processed recursively.
+     * 
+     * @param String
+     *            that was given to Ring(String) constructor
+     * @return Processes String array
+     */
+    public static String[] processComplexExpression(String str) {
+        ArrayList<String> list = new ArrayList<String>();
+
+        str = str.replaceAll(" ", "");
+
+        String temp = "";
+        boolean expression = false;
+        int countOfExpressions = 0;
+
+        for (int index = 0; index < str.length(); index++) {
+            if (str.charAt(index) == '(' || str.charAt(index) == ')' || expression) {
+                temp += str.charAt(index);
+                countOfExpressions = (str.charAt(index) == '(') ? (countOfExpressions + 1) : (str.charAt(index) == ')' ? countOfExpressions - 1 : countOfExpressions);
+                expression = (str.charAt(index) == ')' && countOfExpressions == 0) ? false : true;
+            } else if (Character.isAlphabetic(str.charAt(index)) || Character.isDigit(str.charAt(index))) {
+                temp += str.charAt(index);
+            } else if (str.charAt(index) == '^' && index + 1 < str.length() && Character.isDigit(str.charAt(index + 1))) {
+                temp += str.charAt(index);
+            } else if (Operation.existPrintName(Character.toString(str.charAt(index))) > -1) {
+                list.add(temp);
+                list.add(Character.toString(str.charAt(index)));
+                temp = "";
+            }
+        }
+
+        if (!temp.isEmpty()) {
+            list.add(temp);
+        }
+
+        Iterator<String> iterator = list.iterator();
+
+        while (iterator.hasNext()) {
+            temp = iterator.next();
+
+            if (temp.contains("^") && temp.substring(temp.indexOf("^") + 1).matches(".*[a-zA-Z]+.*")) {
+                int index = list.indexOf(temp);
+
+                list.set(index, temp.substring(0, temp.indexOf("^")));
+                list.add(index + 1, "^");
+                list.add(index + 2, temp.substring(temp.indexOf("^") + 1));
+
+                iterator = list.iterator();
+            }
+        }
+
+        return list.toArray(new String[list.size()]);
+    }
 }

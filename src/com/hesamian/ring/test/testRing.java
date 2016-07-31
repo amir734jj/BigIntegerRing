@@ -85,4 +85,14 @@ public class testRing {
         assertTrue(ring4.evaluate(dummyMap).equals(BigInteger.valueOf(209)));
 
     }
+
+    @Test
+    public void testReplaceVariables() {
+        assertTrue(new Ring("x^2+4y^3").replaceVariables(new HashMap<String, String>() {
+            {
+                put("x", "z");
+                put("y", "x");
+            }
+        }).equals(new Ring("z^2+4x^3")));
+    }
 }
