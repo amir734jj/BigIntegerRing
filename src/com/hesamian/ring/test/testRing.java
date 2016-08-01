@@ -46,6 +46,13 @@ public class testRing {
         }).equals(BigInteger.valueOf(63)));
 
         assertTrue(new Ring(new Monomial(BigInteger.valueOf(123))).evaluate(new HashMap<String, BigInteger>()).equals(BigInteger.valueOf(123)));
+
+        assertTrue(new Ring("2+16/2^4").evaluate(new HashMap()).equals(BigInteger.valueOf(3)));
+        assertTrue(new Ring("2+16/2^4*2").evaluate(new HashMap()).equals(BigInteger.valueOf(2)));
+        assertTrue(new Ring("2+16/2^4*2+(3-1*3-4^4^5)").evaluate(new HashMap()).equals(BigInteger.valueOf(2)));
+        assertTrue(new Ring("4^4^5").evaluate(new HashMap()).equals(new BigInteger("1099511627776")));
+        assertTrue(new Ring("4^4^5*3/3-1^4^5").evaluate(new HashMap()).equals(new BigInteger("1099511627775")));
+        assertTrue(new Ring("4^4^5*3/3-1^(4^5)").evaluate(new HashMap()).equals(new BigInteger("1099511627775")));
     }
 
     @Test

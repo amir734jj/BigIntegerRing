@@ -164,7 +164,11 @@ public class Ring {
         if (array.size() == 0) {
             return BigInteger.ZERO;
         } else if (array.size() == 1) {
-            return ((Monomial) array.get(0)).evaluate(map);
+            if (array.get(0) instanceof Ring) {
+                return ((Ring) array.get(0)).evaluate(map);
+            } else {
+                return ((Monomial) array.get(0)).evaluate(map);
+            }
         } else {
             int passNumber = 0;
             Object clonedArray[] = array.toArray();
@@ -180,7 +184,6 @@ public class Ring {
                     passNumber = (clonedArray[index] instanceof Operation && ((Operation) clonedArray[index]).intValue() < passNumber) ? 0 : passNumber;
 
                     if (clonedArray[index] instanceof Operation && passNumber == ((Operation) clonedArray[index]).intValue()) {
-
                         operation = (Operation) clonedArray[index];
 
                         if (clonedArray[index - 1] instanceof BigInteger) {

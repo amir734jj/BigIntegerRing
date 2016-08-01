@@ -192,9 +192,26 @@ public class Monomial implements Comparable<Monomial> {
         BigInteger _exponent = null;
         String _name = null;
 
-        if (str.matches("([0-9]*[a-zA-z]*\\^[0-9]*)|([0-9]*[a-zA-Z]*)|([0-9]*)")) {
+        if (str.matches("([0-9]*[a-zA-z]*\\^[0-9]*)+|([0-9]*[a-zA-Z]*)|([0-9]*)")) {
             if (Utility.indexOf("[a-zA-Z]+", str) < 0) {
-                return new Monomial(new BigInteger(str));
+                if (str.indexOf("^") < 0) {
+                    return new Monomial(new BigInteger(str));
+                } else if (str.indexOf("^") > -1) {
+                    if (str.indexOf("^") != str.lastIndexOf("^")) {
+                        String _temp = null;
+                        while (Utility.characterCount('^', str) > 1) {
+                            int _index = str.indexOf("^");
+                            _temp = str.substring(0, _index) + "^" + Integer.parseInt(str.substring(_index + 1, str.indexOf("^", _index + 1)));
+                            str = str.replace(_temp, new BigInteger(str.substring(0, _index)).pow(Integer.parseInt(str.substring(_index + 1, str.indexOf("^", _index + 1)))).toString());
+                        }
+                        return getMonomial(str);
+                    } else {
+                        return new Monomial(new BigInteger(str.substring(0, str.indexOf("^"))).pow(Integer.parseInt(str.substring(str.indexOf("^") + 1))));
+                    }
+                } else {
+                    System.out.println("Given string to getMonomial() method is corrupt.");
+                    return null;
+                }
             } else {
                 if (str.substring(0, Utility.indexOf("[a-zA-Z]+", str)).isEmpty()) {
                     _coefficient = BigInteger.ONE;
@@ -213,6 +230,7 @@ public class Monomial implements Comparable<Monomial> {
                 return new Monomial(_coefficient, _exponent, _name);
             }
         } else {
+            System.out.println("Given string to getMonomial() method is corrupt.");
             return null;
         }
     }

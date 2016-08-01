@@ -19,7 +19,7 @@ public class Operation {
          * Currently 5 operations are supported: exponentiation, multiplication,
          * addition, division and subtraction.
          */
-        exponentiation(0, "pow", "pow, exponentiation, exp,^", "^"), multiplication(1, "multiply", "multiply, multiplication, *", "*"), addition(2, "add", "add, addition, +", "+"), division(3, "divide", "divide, division, /", "/"), subtraction(4, "subtract", "subtract, subtraction, -", "-");
+        exponentiation(0, "pow", "pow, exponentiation, exp,^", "^"), multiplication(1, "multiply", "multiply, multiplication, *", "*"), division(2, "divide", "divide, division, /", "/"), addition(3, "add", "add, addition, +", "+"), subtraction(4, "subtract", "subtract, subtraction, -", "-");
 
         private int integerValue = -1;
         private String method = null;

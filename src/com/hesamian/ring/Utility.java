@@ -36,4 +36,26 @@ public class Utility {
         Matcher matcher = pattern.matcher(str);
         return matcher.find() ? matcher.start() : -1;
     }
+
+    /**
+     * This method returns count of occurrence of specific character in a given
+     * String.
+     * 
+     * @param Specific
+     *            character
+     * @param String
+     *            to search for
+     * @return Count of occurrence of the character
+     */
+    public static int characterCount(Character character, String str) {
+        int counter = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == character) {
+                counter++;
+            }
+        }
+
+        return counter;
+    }
+
 }
