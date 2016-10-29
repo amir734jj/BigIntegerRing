@@ -1,5 +1,5 @@
 # BigInteger Ring
-Polynomial ring using BigInteger library: this library evaluate the following correctly (order of operation is preserved):
+Polynomial ring using BigInteger library: this library evaluates the followings correctly (order of operation is preserved):
 
     Ring ring1 = new Ring("x^2 + 23 *3y + x^3y^z");
     Ring ring2 = new Ring("x^2 + 23 *3y + x*3y+z");
